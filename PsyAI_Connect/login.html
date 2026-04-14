@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+<title>PsyAI Connect | Inicio de sesión</title>
+<script>
+    (function() {
+        function getTheme() {
+            try {
+                var c = document.cookie.split(';');
+                for (var i = 0; i < c.length; i++) {
+                    var x = c[i].trim();
+                    if (x.indexOf('theme=') === 0) return x.substring(6);
+                }
+            } catch(e) {}
+            return localStorage.getItem('theme') || 'light';
+        }
+        var t = getTheme();
+        var d = t === 'dark';
+        document.documentElement.style.backgroundColor = d ? '#030610' : '#ffffff';
+        document.documentElement.style.colorScheme = d ? 'dark' : 'light';
+    })();
+</script>
+<script src="js/shared/theme-inline.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="css/auth.css">
+<link rel="stylesheet" href="responsive/auth.css">
+<link rel="stylesheet" href="css/theme.css">
+
+<script src="js/shared/theme.js"></script>
+<script src="js/shared/localStorage-detector.js"></script>
+</head>
+
+<body>
+
+<!-- Canvas para animación de fondo -->
+<canvas id="bgCanvas" class="canvas-bg"></canvas>
+
+<!-- Enlace Volver al Inicio -->
+<div class="back-index">
+    <a href="index.html">&larr; Volver al Inicio</a>
+</div>
+
+<!-- Login Card -->
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="login-card">
+        <!-- Logo + título -->
+        <div class="login-header">
+            <img src="img/Logo.jpg" alt="Logo">
+            <h1>Iniciar Sesión</h1>
+        </div>
+
+        <form>
+            <!-- Email -->
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="email" placeholder="usuario@example.com">
+            </div>
+
+            <!-- Contraseña -->
+            <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <div style="position:relative;">
+                    <input type="password" class="form-control" id="password" placeholder="Contraseña">
+                    <button type="button" class="password-toggle" onclick="togglePassword('password', this)" tabindex="-1" aria-label="Mostrar contraseña">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selector de rol -->
+            <div class="role-selection">
+                <div class="role-btn active" data-role="paciente">
+                    <i class="fas fa-user"></i>
+                    <span>Paciente</span>
+                </div>
+                <div class="role-btn" data-role="profesional">
+                    <i class="fas fa-stethoscope"></i>
+                    <span>Profesional</span>
+                </div>
+                <div class="role-btn" data-role="admin">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Admin</span>
+                </div>
+            </div>
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary">Entrar</button>
+            </div>
+
+            <div class="text-center">
+                <a href="recover.html" class="text-decoration-none link-action">Olvidar contraseña</a>
+            </div>
+            <div class="text-center">
+                <a href="register.html" class="text-decoration-none link-action">¿No tienes cuenta? Registrarse</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="css/custom-alerts.css">
+<script src="js/shared/alerts.js"></script>
+<script src="js/auth/auth-ui.js"></script>
+<script src="js/auth/login.js"></script>
+</body>
+</html>

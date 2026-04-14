@@ -1,0 +1,4 @@
+# Dependencias Python para PsyAI Connect Backend
+flask
+flask-cors
+mysql-connector-python

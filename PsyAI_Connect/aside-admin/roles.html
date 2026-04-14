@@ -1,0 +1,381 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+<title>PsyAI Connect | Gestión de Roles</title>
+<script>
+    (function() {
+        try {
+            var t = localStorage.getItem('theme');
+            var d = t === 'dark';
+            document.documentElement.style.backgroundColor = d ? '#030610' : '#ffffff';
+            document.documentElement.style.colorScheme = d ? 'dark' : 'light';
+        } catch(e) {}
+    })();
+</script>
+<script src="../js/shared/theme-inline.js"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../responsive/aside.css">
+<link rel="stylesheet" href="../responsive/admin.css">
+<script src="../js/shared/theme.js"></script>
+    <script src="../js/shared/localStorage-detector.js"></script>
+</head>
+<body>
+
+<button class="toggle-btn" id="toggleSidebar"><i class="fas fa-bars"></i></button>
+
+<div class="d-flex">
+
+  <aside class="sidebar d-flex flex-column position-fixed shadow-sm">
+        <div class="sidebar__logo text-center mt-3">
+            <img src="../img/Logo.jpg" alt="PsyAI Connect Logo" class="img-fluid rounded-circle" width="100">
+            <h5 class="mt-2 fw-bold text-primary">PsyAI Connect</h5>
+        </div>
+    <nav class="nav flex-column mt-4">
+        <a href="../admin.dashboard.html" class="nav-link"><i class="fas fa-home me-2"></i> Dashboard</a>
+        <a href="users.html" class="nav-link"><i class="fas fa-users me-2"></i> Usuarios <span id="sidebarBloqueados" class="badge rounded-pill ms-1" style="background:#ffebee;color:#c62828;font-size:.68rem;display:none;"></span></a>
+        <a href="roles.html" class="nav-link active"><i class="fas fa-user-shield me-2"></i> Roles</a>
+        <a href="notifications.html" class="nav-link"><i class="fas fa-bell me-2"></i> Notificaciones</a>
+        <a href="logs.html" class="nav-link"><i class="fas fa-clipboard-list me-2"></i> Logs</a>
+    </nav>
+        <div class="sidebar__footer mt-auto mb-3 text-center">
+            <div class="theme-switch-container mb-2">
+                <i class="fa-solid fa-sun theme-icon sun" id="sun-icon"></i>
+                <button id="theme-toggle" title="Cambiar modo"></button>
+                <i class="fa-solid fa-moon theme-icon moon" id="moon-icon"></i>
+            </div>
+            <a href="#" onclick="cerrarSesion()" class="btn btn-outline-danger btn-sm w-75"><i class="fas fa-sign-out-alt me-1"></i> Cerrar Sesión</a>
+        </div>
+    </aside>
+
+  <main class="main-content flex-grow-1 ms-250 p-4">
+
+    <!-- Header -->
+    <header class="main-header d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="h3 fw-bold mb-0"><i class="fas fa-user-shield me-2 text-primary"></i>Gestión de Roles</h1>
+        <small class="text-muted">Administra los roles y permisos de los usuarios del sistema.</small>
+      </div>
+      <div class="user-info"><i class="fas fa-bell me-2 text-secondary"></i>Hola, Administrador</div>
+    </header>
+
+    <!-- Tabs de navegación -->
+    <div class="logs-tabs">
+      <button class="logs-tab active" onclick="mostrarTab('usuarios', this)">
+        <i class="fas fa-users"></i> Usuarios
+        <span class="tab-count" id="cntUsuarios">0</span>
+      </button>
+      <button class="logs-tab" onclick="mostrarTab('historial', this)">
+        <i class="fas fa-user-cog"></i> Actualización de Rangos
+        <span class="tab-count" id="cntHistorialTab">0</span>
+      </button>
+      <button class="logs-tab" onclick="mostrarTab('agregar', this)">
+        <i class="fas fa-plus-circle"></i> Agregar Rol
+      </button>
+    </div>
+
+    <!-- Ã¢â€¢ÂÃ¢â€¢Â TAB: Usuarios Ã¢â€¢ÂÃ¢â€¢Â -->
+    <div id="tab-usuarios">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <select id="filtroRol" class="form-control form-control-sm" style="width:160px;">
+            <option value="">Todos los roles</option>
+            <option value="paciente">Paciente</option>
+            <option value="profesional">Profesional</option>
+            <option value="admin">Administrador</option>
+          </select>
+          <select id="filtroEstado" class="form-control form-control-sm" style="width:160px;">
+    <option value="">Todos los estados</option>
+    <option value="activo">Activo</option>
+    <option value="inactivo">Inactivo</option>
+</select>
+          <input type="text" id="buscarUsuario" class="form-control form-control-sm" placeholder="&#xf002;  Buscar usuario..." style="width:220px;">
+        </div>
+        <div class="toolbar-right">
+          <span class="text-muted" style="font-size:.82rem; align-self:center;">3 usuarios encontrados</span>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+          <table class="table table-clean mb-0">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>última actividad</th>
+                <th class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaUsuarios">
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar">JP</div>
+                    <div>
+                      <div class="user-name">Juan Pérez</div>
+                      <div class="user-email">juan@mail.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="badge bg-info">Paciente</span></td>
+                <td><span class="badge bg-success">Activo</span></td>
+                <td class="text-muted" style="font-size:.82rem;">Hoy, 09:14</td>
+                <td class="text-end">
+                  <div class="d-flex justify-content-end gap-1">
+                    <button class="action-btn edit" onclick="abrirModalEditar(1,'Juan Pérez','paciente')" title="Editar rol"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete" onclick="abrirModalEliminarRol(1,'Juan Pérez','paciente')" title="Eliminar rol"><i class="fas fa-trash"></i></button>
+
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar" style="background:#e8f0fe;color:#0d47a1;">ML</div>
+                    <div>
+                      <div class="user-name">Dra. María López</div>
+                      <div class="user-email">maria@mail.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="badge bg-primary">Profesional</span></td>
+                <td><span class="badge bg-success">Activo</span></td>
+                <td class="text-muted" style="font-size:.82rem;">Ayer, 11:30</td>
+                <td class="text-end">
+                  <div class="d-flex justify-content-end gap-1">
+                    <button class="action-btn edit" onclick="abrirModalEditar(2,'Dra. María López','profesional')" title="Editar rol"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete" onclick="abrirModalEliminarRol(2,'Dra. María López','profesional')" title="Eliminar rol"><i class="fas fa-trash"></i></button>
+
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar" style="background:#fef3e2;color:#e65100;">AG</div>
+                    <div>
+                      <div class="user-name">Ana Gómez</div>
+                      <div class="user-email">ana@mail.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="badge bg-info">Paciente</span></td>
+                <td><span class="badge bg-warning text-dark">Inactivo</span></td>
+                <td class="text-muted" style="font-size:.82rem;">08/03/2026</td>
+                <td class="text-end">
+                  <div class="d-flex justify-content-end gap-1">
+                    <button class="action-btn edit" onclick="abrirModalEditar(3,'Ana Gómez','paciente')" title="Editar rol"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete" onclick="abrirModalEliminarRol(3,'Ana Gómez','paciente')" title="Eliminar rol"><i class="fas fa-trash"></i></button>
+                    <button class="action-btn activate" onclick="confirmarAccion(3,'Ana Gómez','activar')" title="Activar"><i class="fas fa-check"></i></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ã¢â€¢ÂÃ¢â€¢Â TAB: Agregar Rol Ã¢â€¢ÂÃ¢â€¢Â -->
+    <div id="tab-agregar" style="display:none;">
+      <div class="row justify-content-center">
+        <div class="col-lg-6">
+          <div class="card shadow-sm border-0 p-4">
+            <h6 class="fw-bold mb-4" style="color:#1a2b40;"><i class="fas fa-plus-circle me-2 text-primary"></i>Asignar nuevo rol a usuario</h6>
+            <div class="form-section">
+              <form id="formAsignarRol">
+                <div class="mb-3">
+                  <label class="form-label">Email del Usuario</label>
+                  <input type="email" id="emailUsuario" class="form-control" placeholder="correo@ejemplo.com">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Rol a Agregar</label>
+                  <select id="nuevoRol" class="form-control">
+                    <option value="">Seleccionar rol</option>
+                    <option value="paciente">Paciente</option>
+                    <option value="profesional">Profesional</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label">Motivo / Observación</label>
+                  <textarea id="motivoAsignacion" class="form-control" rows="3" placeholder="Describe brevemente el motivo..."></textarea>
+                </div>
+                <button type="button" id="btnAsignarRol" class="btn btn-primary w-100">
+                  <i class="fas fa-save me-2"></i>Guardar Rol
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ã¢â€¢ÂÃ¢â€¢Â TAB: Historial Ã¢â€¢ÂÃ¢â€¢Â -->
+    <div id="tab-historial" style="display:none;">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <select id="filtroHistorial" class="form-control form-control-sm" style="width:150px;">
+            <option value="">Todas las acciones</option>
+            <option value="agregado">Agregado</option>
+            <option value="editado">Editado</option>
+            <option value="eliminado">Eliminado</option>
+          </select>
+          <input type="date" id="fechaHistorial" class="form-control form-control-sm" style="width:160px;">
+        </div>
+        <div class="toolbar-right">
+          <span class="text-muted" style="font-size:.82rem; align-self:center;"><span id="cntHistorial">0</span> registros</span>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+          <table class="table table-clean mb-0">
+            <thead>
+              <tr>
+                <th>Fecha y hora</th>
+                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Rol anterior</th>
+                <th>Rol nuevo</th>
+                <th>Realizado por</th>
+              </tr>
+            </thead>
+            <tbody id="tablaHistorial">
+              <tr>
+                <td class="text-muted" style="font-size:.82rem; white-space:nowrap;">01/03/2026 Ã¢â‚¬â€ 09:14</td>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar">JP</div>
+                    <span class="user-name">Juan Pérez</span>
+                  </div>
+                </td>
+                <td><span class="history-action added"><i class="fas fa-plus-circle"></i> Agregado</span></td>
+                <td class="text-muted">Ã¢â‚¬â€</td>
+                <td><span class="badge bg-info">Paciente</span></td>
+                <td class="text-muted" style="font-size:.82rem;">Admin</td>
+              </tr>
+              <tr>
+                <td class="text-muted" style="font-size:.82rem; white-space:nowrap;">05/03/2026 Ã¢â‚¬â€ 11:30</td>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar" style="background:#e8f0fe;color:#0d47a1;">ML</div>
+                    <span class="user-name">Dra. María López</span>
+                  </div>
+                </td>
+                <td><span class="history-action edited"><i class="fas fa-pen"></i> Editado</span></td>
+                <td><span class="badge bg-info">Paciente</span></td>
+                <td><span class="badge bg-primary">Profesional</span></td>
+                <td class="text-muted" style="font-size:.82rem;">Admin</td>
+              </tr>
+              <tr>
+                <td class="text-muted" style="font-size:.82rem; white-space:nowrap;">08/03/2026 Ã¢â‚¬â€ 15:02</td>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar" style="background:#fef0f0;color:#c62828;">CR</div>
+                    <span class="user-name">Carlos Ruiz</span>
+                  </div>
+                </td>
+                <td><span class="history-action removed"><i class="fas fa-trash"></i> Eliminado</span></td>
+                <td><span class="badge bg-primary">Profesional</span></td>
+                <td class="text-muted">Ã¢â‚¬â€</td>
+                <td class="text-muted" style="font-size:.82rem;">Admin</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL: Editar Rol -->
+<div class="modal fade" id="modalEditarRol" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold"><i class="fas fa-edit me-2 text-primary"></i>Editar Rol</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body pt-2">
+        <p class="text-muted mb-3" style="font-size:.875rem;">Usuario: <strong id="modalNombreUsuario" class="text-dark"></strong></p>
+        <div class="mb-3">
+          <label class="form-label fw-semibold" style="font-size:.82rem;">Nuevo Rol</label>
+          <select id="modalNuevoRol" class="form-control">
+            <option value="paciente">Paciente</option>
+            <option value="profesional">Profesional</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label fw-semibold" style="font-size:.82rem;">Observación <span class="text-muted fw-normal">(opcional)</span></label>
+          <textarea id="modalObservacion" class="form-control" rows="2" placeholder="Motivo del cambio..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+        <button id="btnGuardarRol" class="btn btn-primary"><i class="fas fa-save me-1"></i>Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Eliminar Rol -->
+<div class="modal fade" id="modalEliminarRol" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold"><i class="fas fa-trash me-2 text-danger"></i>Eliminar Rol</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="font-size:.875rem;">
+        ¿Eliminar el rol <strong id="modalRolEliminar"></strong> de <strong id="modalUsuarioEliminar"></strong>?<br>
+        <span class="text-muted">Esta acción quedará en el historial.</span>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button id="btnConfirmarEliminarRol" class="btn btn-danger btn-sm"><i class="fas fa-trash me-1"></i>Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Confirmar -->
+<div class="modal fade" id="modalConfirmar" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold">Confirmar acción</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modalConfirmarMensaje" style="font-size:.875rem;">¿Estás seguro?</div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button id="btnConfirmarAccion" class="btn btn-danger btn-sm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="../css/custom-alerts.css">
+<script src="../js/shared/alerts.js"></script>
+<script src="../js/shared/aside.js"></script>
+<script src="../js/aside-admin/admin.roles.js"></script>
+<script src="../js/auth/logout.js"></script>
+
+</body>
+</html>
+
+
